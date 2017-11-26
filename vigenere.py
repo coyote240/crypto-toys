@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 
+import string
 import argparse
 import itertools
-from caesar import alphabet
+from sys import stdin
+
+
+alphabet = string.ascii_lowercase
 
 
 def shift(c, k):
@@ -16,18 +20,29 @@ def shift(c, k):
     return alphabet[new_index]
 
 
+def message_iterator(message):
+    for m in message:
+        if m not in string.ascii_letters:
+            continue
+        yield str.lower(m)
+
+
 def key_iterator(key):
     for i in itertools.count():
         yield key[i % len(key)]
 
 
 def crypt(message, key):
-    return [shift(m, k) for m, k in zip(message, key_iterator(key))]
+    if message is '-':
+        message = stdin.read()
+
+    return [shift(m, k) for m, k in zip(
+        message_iterator(message), key_iterator(key))]
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('message')
+    parser.add_argument('message', default='-')
     parser.add_argument('-k', '--key', type=str)
     args = parser.parse_args()
 

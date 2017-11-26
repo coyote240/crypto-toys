@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
+import string
 import argparse
+from sys import stdin
 
 
-alphabet = 'abcdefghijklmnopqrstuvwxyz'
+alphabet = string.ascii_lowercase
 
 
 def shift(c, count):
@@ -16,13 +18,23 @@ def shift(c, count):
     return alphabet[new_index]
 
 
+def message_iterator(message):
+    for m in message:
+        if m not in string.ascii_letters:
+            continue
+        yield str.lower(m)
+
+
 def crypt(message, count):
-    return [shift(l, count) for l in message]
+    if message is '-':
+        message = stdin.read()
+
+    return [shift(l, count) for l in message_iterator(message)]
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('message')
+    parser.add_argument('message', default='-')
     parser.add_argument('-c', '--count', type=int, default=1)
     args = parser.parse_args()
 
